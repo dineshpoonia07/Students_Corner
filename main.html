@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Corner Lost & Found</title>
+<script src="app.js" defer></script>
+<script src="home-redirect.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cork: #ffb701;
+    --cork-dark: #ffaf03;
+    --paper: #FFFFFF;
+    --paper-shadow: #EFEFEF;
+    --ink: #000000;
+    --pin-red: #C1440E;
+    --pin-teal: #2E5F58;
+    --twine: #8B6F47;
+    --found-green: #3F6C51;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cork);
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.08) 0%, transparent 2%),
+      radial-gradient(circle at 70% 60%, rgba(0,0,0,0.07) 0%, transparent 2%),
+      radial-gradient(circle at 40% 80%, rgba(0,0,0,0.06) 0%, transparent 1.5%),
+      radial-gradient(circle at 85% 15%, rgba(0,0,0,0.05) 0%, transparent 1.5%),
+      linear-gradient(135deg, var(--cork) 0%, var(--cork-dark) 100%);
+    font-family: 'Inter', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 48px 20px 80px;
+  }
+
+  .board {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .topnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+  }
+
+  .brand {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 20px;
+    color: var(--paper);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+  }
+
+  .auth-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .auth-btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .auth-btn.login {
+    background: transparent;
+    border: 1.5px solid var(--paper);
+    color: var(--paper);
+  }
+
+  .auth-btn.login:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  .auth-btn.signup {
+    background: var(--ink);
+    border: 1.5px solid var(--ink);
+    color: var(--paper);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  }
+
+  .auth-btn.signup:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 9px rgba(0,0,0,0.3);
+  }
+
+  .auth-btn:focus-visible {
+    outline: 2px solid var(--paper);
+    outline-offset: 2px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--paper);
+    background: var(--ink);
+    padding: 6px 14px;
+    transform: rotate(-1deg);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(40px, 7vw, 68px);
+    color: var(--paper);
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    line-height: 1.05;
+    transform: rotate(-0.5deg);
+  }
+
+  .tagline {
+    margin-top: 14px;
+    font-size: 16px;
+    color: var(--paper);
+    opacity: 0.85;
+    font-weight: 500;
+  }
+
+  .notices {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 64px;
+  }
+
+  .card {
+    position: relative;
+    background: var(--paper);
+    padding: 18px 20px 14px;
+    width: 220px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.22), 0 2px 0 rgba(255,255,255,0.4) inset;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .card:nth-child(1) { transform: rotate(-2deg); }
+  .card:nth-child(2) { transform: rotate(1.5deg); }
+
+  .card:hover, .card:focus-visible {
+    transform: rotate(0deg) translateY(-4px);
+    box-shadow: 0 16px 26px rgba(0,0,0,0.3), 0 2px 0 rgba(255,255,255,0.4) inset;
+    outline: none;
+  }
+
+  .card:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 4px;
+  }
+
+  .pin {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    box-shadow: 0 3px 4px rgba(0,0,0,0.4);
+  }
+
+  .card.lost .pin { background: radial-gradient(circle at 35% 30%, #e06a3f, var(--pin-red)); }
+  .card.found .pin { background: radial-gradient(circle at 35% 30%, #4d8a71, var(--found-green)); }
+
+  .card .stamp {
+    font-family: 'Courier Prime', monospace;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 4px;
+  }
+
+  .card h2 {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .card.lost h2 { color: var(--pin-red); }
+  .card.found h2 { color: var(--found-green); }
+
+  .card p {
+    display: none;
+  }
+
+  .card .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 12px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .tape {
+    position: absolute;
+    width: 70px;
+    height: 22px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .card.lost .tape { top: -10px; right: 18px; transform: rotate(8deg); }
+  .card.found .tape { top: -10px; right: 18px; transform: rotate(-6deg); }
+
+  .feed {
+    background: var(--paper);
+    padding: 28px 24px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    transform: rotate(0.4deg);
+    position: relative;
+  }
+
+  .feed .pin { position: absolute; top: -14px; left: 32px; width: 20px; height: 20px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #7a9fd6, var(--pin-teal)); box-shadow: 0 3px 4px rgba(0,0,0,0.4); }
+
+  .feed h3 {
+    font-family: 'Courier Prime', monospace;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    color: #4a4136;
+  }
+
+  .feed ul { list-style: none; }
+
+  .feed li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--paper-shadow);
+    font-size: 14px;
+  }
+
+  .feed li:last-child { border-bottom: none; }
+
+  .feed li .tag {
+    font-family: 'Courier Prime', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    white-space: nowrap;
+    height: fit-content;
+  }
+
+  .feed li .tag.lost { background: #fbe4d8; color: var(--pin-red); }
+  .feed li .tag.found { background: #dcecdf; color: var(--found-green); }
+
+  .feed li .where { color: #7a6f5d; font-size: 12px; }
+
+  footer {
+    text-align: center;
+    margin-top: 56px;
+    font-family: 'Courier Prime', monospace;
+    font-size: 12px;
+    color: var(--paper);
+    opacity: 0.7;
+  }
+</style>
+</head>
+<body>
+
+<div class="board">
+  <nav class="topnav">
+    <span  class="brand">Students Corner</span>
+    <div class="auth-buttons">
+       <button onclick="window.location.href='login.html'" class="auth-btn login" id="loginBtn" type="button">Log In</button>
+      <button onclick="window.location.href='signup.html'"  class="auth-btn signup" id="signupBtn" type="button">Sign Up</button>
+    </div>
+  </nav>
+
+  <header>
+    <span class="eyebrow">Noticeboard</span>
+    <h1>Students Corner<br>Lost &amp; Found</h1>
+    <p class="tagline">Pin a notice. Reunite something with someone.</p>
+  </header>
+
+  <div class="notices">
+    <button class="card lost" id="lostBtn" type="button">
+      <span class="pin"></span>
+      <span class="tape"></span>
+      <h2>I Lost Something</h2>
+      <p>Left your umbrella on the 7 bus? Dropped your keys at the park? Post a notice and let the neighborhood keep an eye out.</p>
+      <span><a href="report-lost.html" style="color: rgb(255, 196, 0); text-decoration: none;"><b>Post a lost notice →</b></a></span>
+
+    </button>
+
+    <button class="card found" id="foundBtn" type="button">
+      <span class="pin"></span>
+      <span class="tape"></span>
+      <h2>I Found Something</h2>
+      <p>Picked up a wallet, a scarf, a wandering cat? Pin it here so its person can find their way back to it.</p>
+      <span><a href="report-found.html" style="color: rgb(255, 196, 0); text-decoration: none;"><b>Post a lost notice →</b></a></span>
+    </button>
+  </div>
+
+  <div class="feed">
+    <span class="pin"></span>
+    <h3>Recently pinned</h3>
+    <ul>
+      <li>
+        <div>Black Leptop Backpack<br><span class="where">Near 2118 Room · 2 hrs ago</span></div>
+        <span class="tag found">Found</span>
+      </li>
+      <li>
+        <div>Navy backpack, laptop inside<br><span class="where">Near Main Gate· On 11 August 2026</span></div>
+        <span class="tag lost">Lost</span>
+      </li>
+      <li>
+        <div>keys, red keychain<br><span class="where">Room no. 2131 · 2 days ago</span></div>
+        <span class="tag found">Found</span>
+      </li>
+    </ul>
+  </div>
+
+  <footer>WE ARE ALWAYS WITH YOU !</footer>
+</div>
+
+<script>
+  document.getElementById('loginBtn').addEventListener('click', () => {
+  });
+  document.getElementById('signupBtn').addEventListener('click', () => {
+  });
+  document.getElementById('lostBtn').addEventListener('click', () => {
+  });
+  document.getElementById('foundBtn').addEventListener('click', () => {
+  });
+</script>
+
+</body>
+</html>
